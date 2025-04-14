@@ -22,18 +22,20 @@ public class Main {
 			if (!tokenfile.exists()) {
 				try {
 					if (!tokenfile.createNewFile()) {
-						System.err.println("Failed to create token.txt!");
-						if (!GraphicsEnvironment.isHeadless()) {
-							JOptionPane.showMessageDialog(null, "Failed to create token.txt!");
-						}
+						error("Failed to create token.txt!");
 					}
 				} catch (IOException e1) {
 					e1.printStackTrace();
 				}
 			}
-			if (!GraphicsEnvironment.isHeadless()) {
-				JOptionPane.showMessageDialog(null, "Invalid token in token.txt!");
-			}
+			error("Invalid token in token.txt!");
+		}
+	}
+
+	public static void error(String string) {
+		System.err.println(string);
+		if (!GraphicsEnvironment.isHeadless()) {
+			JOptionPane.showMessageDialog(null, string);
 		}
 	}
 }

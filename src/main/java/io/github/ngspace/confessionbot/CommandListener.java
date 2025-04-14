@@ -2,26 +2,29 @@ package io.github.ngspace.confessionbot;
 
 import java.awt.Color;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
-
-import org.apache.commons.codec.digest.DigestUtils;
 
 import io.github.ngspace.nnupref.IncompatibleTypeException;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 
 public class CommandListener extends ListenerAdapter {
 	
-	public static final Map<Long, Server> servers = new HashMap<Long, Server>();
 	
-	
+	public ConfessionBot bot;
+
+
+
+	public CommandListener(ConfessionBot confessionBot) {
+		this.bot = confessionBot;
+	}
+
+
+
 	@Override public synchronized void onSlashCommandInteraction(SlashCommandInteractionEvent event) {
 		Server server = null;
 		try {
-			server = getServer(event.getGuild().getIdLong());
+			server = bot.getServer(event.getGuild().getIdLong());
 		} catch (IOException e) {
 			event.reply("Error occured").setEphemeral(true).queue();
 			event.getChannel().sendMessage("Failed to load or create server").queue();
@@ -32,7 +35,7 @@ public class CommandListener extends ListenerAdapter {
 		
 		switch (event.getName()) {
 			case "confess": {
-				String userhash = getHash(event.getUser());
+				String userhash = bot.getHash(event.getUser());
 				
 				if (server.logmessages()&&isUserBanned(userhash,server)) {
 					event.reply("Your confessions are too weird, you've been banned.").setEphemeral(true).queue();
@@ -84,20 +87,6 @@ public class CommandListener extends ListenerAdapter {
 	
 	
 	
-	public String getHash(User user) {
-		return DigestUtils.sha256Hex(String.valueOf(user.getIdLong()));
-	}
-	
-	
-	
-	public Server getServer(long serverID) throws IOException {
-		Server s = servers.get(serverID);
-		if (s==null) servers.put(serverID, (s=Server.createOrLoadServer(serverID)));
-		return s;
-	}
-	
-	
-	
 	public int getMessageNum(String userhash, Server server) {
 		if (!server.logmessages()) return -1;
 		int id = server.msgIds().size()+1;
@@ -105,7 +94,8 @@ public class CommandListener extends ListenerAdapter {
 			server.msgIds().set(String.valueOf(id), userhash);
 		} catch (NullPointerException | IncompatibleTypeException | IOException e) {
 			e.printStackTrace();
-			throw new RuntimeException("Failed to attach messageid", e);
+			Main.error("Failed to attach messageid");
+			System.exit(1);
 		}
 		return id;
 	}
