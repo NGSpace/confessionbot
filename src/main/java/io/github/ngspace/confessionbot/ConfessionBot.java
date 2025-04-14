@@ -40,7 +40,7 @@ public class ConfessionBot {
 			Commands.slash("pardonsinner", "Pardon the sinners").setDefaultPermissions(permissions).addOption(
 					OptionType.STRING, "messageid", "What is the sinner's message?", true),
 			Commands.slash("setmessagelogging", "Should give messages one-way uids or not (Banning will not be possible"
-					+ " if disabled)")
+					+ " if disabled)").setDefaultPermissions(DefaultMemberPermissions.enabledFor(Permission.MANAGE_SERVER))
 					.addOption(OptionType.BOOLEAN, "messagelogging","true or false", true));
 		
 		commands.queue();
