@@ -1,0 +1,9 @@
+logs/
+.mvn/
+.settings/
+target/
+servers/
+
+.project
+.classpath
+token.txt
